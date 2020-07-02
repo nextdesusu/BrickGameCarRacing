@@ -1,0 +1,11 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2C3E50;
+    color: #F9F6EE;
+}
+
+:host > a:visited {
+    color: rgb(233, 177, 25);
+}
