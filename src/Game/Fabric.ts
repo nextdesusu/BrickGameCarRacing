@@ -17,12 +17,16 @@ export default class Fabric {
     player: Car;
     enemies: Array<Car>;
     constructor() {
-
+        this.enemies = []
     }
 
     spawnEnemyCar(x, y): void {
         const enemy = new Car(ENEMY_CAR, x, y);
         this.enemies.push(enemy);
+    }
+
+    removeEnemy(toRemove: Car) {
+        this.enemies = this.enemies.filter((enemy) => enemy !== toRemove);
     }
 
     spawnPlayer(x, y): void {

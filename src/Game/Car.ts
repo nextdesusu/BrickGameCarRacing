@@ -14,4 +14,8 @@ export default class Car {
         this.x = x;
         this.y = y;
     }
+
+    isBeenHit(otherCar: Car) {
+        
+    }
 }
