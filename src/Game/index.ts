@@ -7,7 +7,7 @@ const randomInteger = (min: number, max: number): number => {
     return Math.round(rand);
 }
 
-export const startGame = (ctx: any, width: number, height: number): void => {
+export const startGame = (ctx: any, width: number, height: number, controls: any): void => {
     let timerId;
     let paused: boolean = false;
     let distanceFromPreciousEnemy = 0;
@@ -64,16 +64,18 @@ export const startGame = (ctx: any, width: number, height: number): void => {
             }
             enemy.move(x, y + 1);
         }
-        /*
-        if (distanceFromPreciousEnemy > 9) {
+        if (distanceFromPreciousEnemy > 11) {
             const x = randomInteger(1, 10 - 4);
             const y = 0;
             fabric.spawnEnemyCar(x, y);
             distanceFromPreciousEnemy = 0;
         }
-        */
+        player.move(controls.positionX, player.y);
+        if (controls.space) {
+            paused = !paused;
+        }
         if (!paused) {
-            timerId = setTimeout(gameLoop, SECOND / speed);
+            timerId = setTimeout(gameLoop, SECOND / (speed * 2));
         }
     }
     timerId = setTimeout(gameLoop, SECOND / speed);

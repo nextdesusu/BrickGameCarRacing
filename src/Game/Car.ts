@@ -21,7 +21,6 @@ export default class Car {
         const y1 = this.y;
         const w1 = this.x + CAR_W - 1;
         const h1 = this.y + CAR_H - 1;
-        console.log(`tc: ${[x1, y1, w1, h1]} ec: ${[x2, y2, w2, h2]}`)
         if ((x1 > w2)
             || (w1 < x2)
             || (y1 > h2)
