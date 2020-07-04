@@ -1,34 +1,36 @@
-import { GAME_TABLE, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
+import { GAME_TABLE_X, GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
 import { carMask } from "./gameTypes";
 import Fabric from "./Fabric";
 
-export const startGame = (ctx: null | any, width: number, height: number): void => {
-    //w = 10
-    //h = 20
-    //ctx.fillRect(0, 0, width, height);
+const randomInteger = (min: number, max: number): number => {
+    const rand: number = min - 0.5 + Math.random() * (max - min + 1);
+    return Math.round(rand);
+}
+
+export const startGame = (ctx: any, width: number, height: number): void => {
     let timerId;
+    let paused: boolean = false;
+    let distanceFromPreciousEnemy = 0;
     let speed: number = 8;
-    const mapY: number = GAME_TABLE[0].length;
     const cellSizeW: number = Math.floor(width / 20);
     const cellSizeH: number = Math.floor(height / 20);
     const fabric: Fabric = new Fabric();
     fabric.spawnPlayer(3, 15);
-    fabric.spawnEnemyCar(1, 1);
-    fabric.spawnEnemyCar(1, 10);
+    fabric.spawnEnemyCar(5, 3);
     const gameLoop = () => {
+        distanceFromPreciousEnemy += 1;
         ctx.fillStyle = BG_COLOR;
         ctx.fillRect(0, 0, width, height);
         ctx.strokeStyle = SM_COLOR;
         ctx.fillStyle = SM_COLOR;
-        for (let x = 0; x < GAME_TABLE.length; x++) {
-            for (let y = 0; y < GAME_TABLE[x].length; y++) {
+        for (let x = 0; x < GAME_TABLE_X; x++) {
+            for (let y = 0; y < GAME_TABLE_Y; y++) {
                 ctx.strokeRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
                 ctx.fillRect(x * cellSizeW + 5, y * cellSizeH + 5, cellSizeW - 10, cellSizeH - 10)
             }
         }
         ctx.strokeStyle = M_COLOR;
         ctx.fillStyle = M_COLOR;
-        /*
         const player = fabric.player;
         const pMask = player.mask;
         for (let x = 0; x < pMask.length; x++) {
@@ -41,10 +43,8 @@ export const startGame = (ctx: null | any, width: number, height: number): void 
                 }
             }
         }
-        */
         for (const enemy of fabric.enemies) {
             const { mask, x, y } = enemy;
-            enemy.move(x, y + 1);
             for (let sx = 0; sx < mask.length; sx++) {
                 for (let sy = 0; sy < mask[sx].length; sy++) {
                     if (mask[sx][sy] === 1) {
@@ -55,14 +55,26 @@ export const startGame = (ctx: null | any, width: number, height: number): void 
                     }
                 }
             }
-            if (enemy.y > mapY) {
+            if (player.isBeenHit(enemy)) {
+                paused = true;
+                console.log("hit!")
+            }
+            if (enemy.y > GAME_TABLE_Y) {
                 fabric.removeEnemy(enemy);
             }
+            enemy.move(x, y + 1);
         }
-        console.log(fabric.enemies);
-        //player.move(player.x, player.y - 1);
-        //speed += 1;
-        timerId = setTimeout(gameLoop, SECOND / speed);
+        /*
+        if (distanceFromPreciousEnemy > 9) {
+            const x = randomInteger(1, 10 - 4);
+            const y = 0;
+            fabric.spawnEnemyCar(x, y);
+            distanceFromPreciousEnemy = 0;
+        }
+        */
+        if (!paused) {
+            timerId = setTimeout(gameLoop, SECOND / speed);
+        }
     }
     timerId = setTimeout(gameLoop, SECOND / speed);
 }

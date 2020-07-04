@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit} from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular/core';
 import { startGame } from "../../Game";
 
 @Component({
