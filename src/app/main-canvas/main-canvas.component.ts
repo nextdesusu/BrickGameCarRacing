@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular/core';
-import { startGame } from "../../Game";
+import Game from "../../Game";
 const MIN_X = 1, MAX_X = 6;
 
 interface controls {
@@ -17,6 +17,7 @@ export class MainCanvasComponent implements OnInit {
   canvas: ElementRef<HTMLCanvasElement>; 
   ctx = null;
   ctrls: controls;
+  tableWidth: number;
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
     if (event.code === "KeyA") {
@@ -25,12 +26,12 @@ export class MainCanvasComponent implements OnInit {
       }
     }
     if (event.code === "KeyD") {
-      if (this.ctrls.positionX < MAX_X) {
+      if (this.ctrls.positionX < this.tableWidth - 4) {
         this.ctrls.positionX = this.ctrls.positionX + 1;
       }
     }
     if (event.code === "Space") {
-      this.ctrls.pause = true;
+      this.ctrls.pause = !this.ctrls.pause;
     }
   }
 
@@ -42,11 +43,13 @@ export class MainCanvasComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    const canvas = this.canvas.nativeElement
+    this.tableWidth = 10;
+    const canvas = this.canvas.nativeElement;
     const ctx = canvas.getContext('2d');
-    canvas.width = 600;
-    canvas.height = 600;
-    startGame(ctx, canvas.width, canvas.height, this.ctrls);
+    canvas.width = 500;
+    canvas.height = 500;
+    const game = new Game(ctx, canvas.width, canvas.height, this.ctrls, this.tableWidth);
+    game.startLoop();
   }
 
 }

@@ -1,82 +1,135 @@
-import { GAME_TABLE_X, GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
-import { carMask } from "./gameTypes";
+import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND, FPS } from "./consts";
 import Fabric from "./Fabric";
 
-const randomInteger = (min: number, max: number): number => {
-    const rand: number = min - 0.5 + Math.random() * (max - min + 1);
-    return Math.round(rand);
-}
+export default class Game {
+    ctx: any;
+    width: number;
+    height: number;
+    controls: any;
+    tableWidth: number;
+    finished: boolean;
+    cellSizeW: number;
+    cellSizeH: number;
+    fabric: Fabric;
+    timeFromPrevMove: any;
+    timeFromSpeedGrow: any;
+    timeFromPrevScore: any;
+    speed: number;
+    score: number;
 
-export const startGame = (ctx: any, width: number, height: number, controls: any): void => {
-    let timerId;
-    let paused: boolean = false;
-    let distanceFromPreciousEnemy = 0;
-    let speed: number = 8;
-    const cellSizeW: number = Math.floor(width / 20);
-    const cellSizeH: number = Math.floor(height / 20);
-    const fabric: Fabric = new Fabric();
-    fabric.spawnPlayer(3, 15);
-    fabric.spawnEnemyCar(5, 3);
-    const gameLoop = () => {
-        distanceFromPreciousEnemy += 1;
-        ctx.fillStyle = BG_COLOR;
-        ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = SM_COLOR;
-        ctx.fillStyle = SM_COLOR;
-        for (let x = 0; x < GAME_TABLE_X; x++) {
-            for (let y = 0; y < GAME_TABLE_Y; y++) {
-                ctx.strokeRect(x * cellSizeW, y * cellSizeH, cellSizeW, cellSizeH);
-                ctx.fillRect(x * cellSizeW + 5, y * cellSizeH + 5, cellSizeW - 10, cellSizeH - 10)
+    constructor(ctx: any, width: number, height: number, controls: any, tableWidth) {
+        this.ctx = ctx;
+        this.width = width;
+        this.height = height;
+        this.controls = controls;
+        this.tableWidth = tableWidth;
+        this.cellSizeW = Math.floor(width / 20);
+        this.cellSizeH = Math.floor(height / 20);
+        this.fabric = new Fabric(tableWidth);
+        this.timeFromPrevMove = 0;
+        this.timeFromSpeedGrow = 0;
+        this.timeFromPrevScore = Date.now();
+
+        this.finished = false;
+        this.speed = 1;
+        this.score = 0;
+
+        this.ctx.font = "36px serif";
+    }
+
+    drawSquare(x: number, y: number) {
+        this.ctx.strokeRect(x * this.cellSizeW, y * this.cellSizeH, this.cellSizeW, this.cellSizeH);
+        this.ctx.fillRect(x * this.cellSizeW + 5, y * this.cellSizeH + 5, this.cellSizeW - 10, this.cellSizeH - 10);
+    }
+
+    drawAll(): void {
+        this.ctx.fillStyle = BG_COLOR;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        this.ctx.strokeStyle = SM_COLOR;
+        this.ctx.fillStyle = SM_COLOR;
+        for (let x = 0; x < this.tableWidth; x += 1) {
+            for (let y = 0; y < GAME_TABLE_Y; y += 1) {
+                this.drawSquare(x, y);
             }
         }
-        ctx.strokeStyle = M_COLOR;
-        ctx.fillStyle = M_COLOR;
-        const player = fabric.player;
+        this.ctx.strokeStyle = M_COLOR;
+        this.ctx.fillStyle = M_COLOR;
+        const player = this.fabric.player;
         const pMask = player.mask;
-        for (let x = 0; x < pMask.length; x++) {
-            for (let y = 0; y < pMask[x].length; y++) {
+        for (let x = 0; x < pMask.length; x += 1) {
+            for (let y = 0; y < pMask[x].length; y += 1) {
                 if (pMask[x][y] === 1) {
                     const nx = x + player.x;
                     const ny = y + player.y;
-                    ctx.strokeRect(nx * cellSizeW, ny * cellSizeH, cellSizeW, cellSizeH);
-                    ctx.fillRect(nx * cellSizeW + 5, ny * cellSizeH + 5, cellSizeW - 10, cellSizeH - 10)
+                    this.drawSquare(nx, ny);
                 }
             }
         }
-        for (const enemy of fabric.enemies) {
+        for (const enemy of this.fabric.enemies) {
             const { mask, x, y } = enemy;
             for (let sx = 0; sx < mask.length; sx++) {
                 for (let sy = 0; sy < mask[sx].length; sy++) {
                     if (mask[sx][sy] === 1) {
                         const nx = sx + x;
                         const ny = sy + y;
-                        ctx.strokeRect(nx * cellSizeW, ny * cellSizeH, cellSizeW, cellSizeH);
-                        ctx.fillRect(nx * cellSizeW + 5, ny * cellSizeH + 5, cellSizeW - 10, cellSizeH - 10)
+                        this.drawSquare(nx, ny);
                     }
                 }
             }
-            if (player.isBeenHit(enemy)) {
-                paused = true;
-                console.log("hit!")
-            }
-            if (enemy.y > GAME_TABLE_Y) {
-                fabric.removeEnemy(enemy);
-            }
-            enemy.move(x, y + 1);
         }
-        if (distanceFromPreciousEnemy > 11) {
-            const x = randomInteger(1, 10 - 4);
-            const y = 0;
-            fabric.spawnEnemyCar(x, y);
-            distanceFromPreciousEnemy = 0;
-        }
-        player.move(controls.positionX, player.y);
-        if (controls.space) {
-            paused = !paused;
-        }
-        if (!paused) {
-            timerId = setTimeout(gameLoop, SECOND / (speed * 2));
-        }
+        const interfaceStartX = this.tableWidth * this.cellSizeW;
+        const maxTextWidth = 200;
+        const scoreX = interfaceStartX + (this.width - interfaceStartX - maxTextWidth / 2) / 2;
+        const scoreY = Math.floor(this.height / 4);
+        this.ctx.fillRect(interfaceStartX, 0, this.width, this.height);
+        this.ctx.fillStyle = BG_COLOR;
+        this.ctx.fillRect(interfaceStartX + 10, 10, (this.width - interfaceStartX - 20), scoreY * 2);
+        this.ctx.fillStyle = M_COLOR;
+        this.ctx.fillText(`Score: ${this.score}`, scoreX, scoreY, maxTextWidth);
     }
-    timerId = setTimeout(gameLoop, SECOND / speed);
+
+    timeCheck(): void {
+        const now = Date.now();
+        if (now - this.timeFromPrevMove > SECOND / this.speed) {
+            for (const enemy of this.fabric.enemies) {
+                if (enemy.y > GAME_TABLE_Y) {
+                    this.fabric.removeEnemy(enemy);
+                }
+                if (this.fabric.player.isBeenHit(enemy)) {
+                    this.finished = true;
+                }
+                if (enemy.y === 6) {
+                    this.fabric.spawnEnemyCar();
+                }
+                enemy.move(enemy.x, enemy.y + 1);
+            }
+            this.timeFromPrevMove = now;
+        }
+        if (now - this.timeFromSpeedGrow > (SECOND * 5)) {
+            this.speed += 1;
+            this.timeFromSpeedGrow = now;
+        }
+        if (now - this.timeFromPrevScore > (SECOND * 2)) {
+            this.score += 1;
+            this.timeFromPrevScore = now;
+        }
+        this.fabric.player.move(this.controls.positionX, this.fabric.player.y);
+
+    }
+
+    startLoop(): void {
+        let timerId;
+        this.fabric.spawnPlayerCar();
+        this.fabric.spawnEnemyCar();
+        const loop = () => {
+            if (!this.finished) {
+                this.drawAll();
+                this.timeCheck(); 
+            } else {
+                // do something with ascore here
+            }
+            timerId = setTimeout(loop, SECOND / FPS);
+        }
+        timerId = setTimeout(loop, SECOND / FPS);
+    }
 }

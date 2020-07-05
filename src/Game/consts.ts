@@ -6,3 +6,4 @@ export const GAME_TABLE_X: number = 10;
 export const GAME_TABLE_Y: number = 20;
 export const CAR_W = 3;
 export const CAR_H = 4;
+export const FPS = 60;
