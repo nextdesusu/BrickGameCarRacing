@@ -43,6 +43,7 @@ export default class Game {
     }
 
     drawAll(): void {
+        this.ctx.lineWidth = 1;
         this.ctx.fillStyle = BG_COLOR;
         this.ctx.fillRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = SM_COLOR;
@@ -78,14 +79,15 @@ export default class Game {
             }
         }
         const interfaceStartX = this.tableWidth * this.cellSizeW;
-        const maxTextWidth = 200;
-        const scoreX = interfaceStartX + (this.width - interfaceStartX - maxTextWidth / 2) / 2;
-        const scoreY = Math.floor(this.height / 4);
-        this.ctx.fillRect(interfaceStartX, 0, this.width, this.height);
-        this.ctx.fillStyle = BG_COLOR;
-        this.ctx.fillRect(interfaceStartX + 10, 10, (this.width - interfaceStartX - 20), scoreY * 2);
-        this.ctx.fillStyle = M_COLOR;
-        this.ctx.fillText(`Score: ${this.score}`, scoreX, scoreY, maxTextWidth);
+        const maxTextWidth = 150;
+        const textStartX = interfaceStartX + (this.width - interfaceStartX - maxTextWidth) / 2;
+        const textStartY = Math.floor(this.height / 6);
+        this.ctx.fillRect(interfaceStartX, 0, 5, this.height);
+        this.ctx.fillText(`Score: ${this.score}`, textStartX, textStartY, maxTextWidth);
+        this.ctx.fillText(`Hi-Score: ${33}`, textStartX, textStartY + 36, maxTextWidth);
+        this.ctx.fillRect(interfaceStartX, textStartY + (36 * 2), this.width, 5);
+        this.ctx.lineWidth = 10;
+        this.ctx.strokeRect(0, 0, this.width, this.height);
     }
 
     timeCheck(): void {
