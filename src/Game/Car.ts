@@ -30,21 +30,18 @@ export default class Car {
     }
 
     isMasksCollide(sx, sy, otherMask: carMask): boolean {
-        let ti = sx, oi = CAR_W - 1;
-        let tj = sy, oj = CAR_H - 1;
-        for (; ti < CAR_W && oi > -1; ti++, oi--) {
-            for (; tj < CAR_H && oj > -1; tj++, oj--) {
-
-            }
-        }
+        
         return true;
     }
 
     isBeenHit(otherCar: Car): boolean {
         const { x, y, mask } = otherCar;
-        const otherW = x + mask.length - 1;
-        const otherH = y + mask[0].length - 1;
+        const otherW = x + CAR_W - 1;
+        const otherH = y + CAR_H - 1;
         if (this.isRectanglesOverlap(x, y, otherW, otherH)) {
+            
+            const tw = this.x + CAR_W - 1;
+            const th = this.y + CAR_H - 1;
             return this.isMasksCollide(x, y, mask);
         }
         return false;

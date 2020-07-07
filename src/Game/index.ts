@@ -1,4 +1,4 @@
-import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND, FPS } from "./consts";
+import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
 import Fabric from "./Fabric";
 
 export default class Game {
@@ -16,6 +16,7 @@ export default class Game {
     timeFromPrevScore: any;
     speed: number;
     score: number;
+    columns: Array<number>;
 
     constructor(ctx: any, width: number, height: number, controls: any, tableWidth) {
         this.ctx = ctx;
@@ -29,6 +30,7 @@ export default class Game {
         this.timeFromPrevMove = 0;
         this.timeFromSpeedGrow = 0;
         this.timeFromPrevScore = Date.now();
+        this.columns = [3, 7, 11, 15, 19];
 
         this.finished = false;
         this.speed = 1;
@@ -48,13 +50,28 @@ export default class Game {
         this.ctx.fillRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = SM_COLOR;
         this.ctx.fillStyle = SM_COLOR;
-        for (let x = 0; x < this.tableWidth; x += 1) {
+        let cols = [3, 7, 11, 15, 20];
+        for (let x = 1; x < this.tableWidth - 1; x += 1) {
             for (let y = 0; y < GAME_TABLE_Y; y += 1) {
                 this.drawSquare(x, y);
             }
         }
         this.ctx.strokeStyle = M_COLOR;
         this.ctx.fillStyle = M_COLOR;
+        for (let y = 0; y < GAME_TABLE_Y; y += 1) {
+            this.drawSquare(0, y);
+            this.drawSquare(this.tableWidth - 1, y);
+        }
+        this.ctx.strokeStyle = SM_COLOR;
+        this.ctx.fillStyle = SM_COLOR;
+        for (const columnI of this.columns) {
+            this.drawSquare(0, columnI);
+            this.drawSquare(this.tableWidth - 1, columnI);
+        }
+    
+        this.ctx.strokeStyle = M_COLOR;
+        this.ctx.fillStyle = M_COLOR;
+
         const player = this.fabric.player;
         const pMask = player.mask;
         for (let x = 0; x < pMask.length; x += 1) {
@@ -78,6 +95,7 @@ export default class Game {
                 }
             }
         }
+
         const interfaceStartX = this.tableWidth * this.cellSizeW;
         const maxTextWidth = 150;
         const textStartX = interfaceStartX + (this.width - interfaceStartX - maxTextWidth) / 2;
@@ -104,6 +122,8 @@ export default class Game {
                     this.fabric.spawnEnemyCar();
                 }
                 enemy.move(enemy.x, enemy.y + 1);
+
+                this.columns = this.columns.map((columnI) => columnI > 18 ? 0 : columnI + 1);
             }
             this.timeFromPrevMove = now;
         }
@@ -120,7 +140,6 @@ export default class Game {
     }
 
     startLoop(): void {
-        let timerId;
         this.fabric.spawnPlayerCar();
         this.fabric.spawnEnemyCar();
         const loop = () => {
@@ -128,10 +147,10 @@ export default class Game {
                 this.drawAll();
                 this.timeCheck(); 
             } else {
-                // do something with ascore here
+                // do something with a score here
             }
-            timerId = setTimeout(loop, SECOND / FPS);
+            window.requestAnimationFrame(loop);
         }
-        timerId = setTimeout(loop, SECOND / FPS);
+        window.requestAnimationFrame(loop);
     }
 }
