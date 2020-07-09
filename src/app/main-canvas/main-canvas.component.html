@@ -4,18 +4,21 @@
 >
 </canvas>
 <div #menu class="menu">
-    <h3>score: {{stats.score}}</h3>
-    <h3>speed: {{stats.speed}}</h3>
-    <div>
+    <div class="menu-text">
+        <h3>score: {{stats.score}}</h3>
+        <h3>speed: {{stats.speed}}</h3>
+    </div>
+    <div class="menu-top">
         <h3>top players</h3>
         <ol>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>{{records[0].name}}: {{records[0].score}}</li>
+            <li>{{records[1].name}}: {{records[1].score}}</li>
+            <li>{{records[2].name}}: {{records[2].score}}</li>
         </ol>
     </div>
 </div>
 <div #overlap class="overlap">
-    <label>enter name <input/></label>
+    <label>enter name <input (keyup)="onKeyUp($event)"/></label>
+    <span #errorMessage class="error-message">Name must contain from 4 to 8 alphabetic or digit characters</span>
     <button (click)="startGame()">start game</button>
 </div>

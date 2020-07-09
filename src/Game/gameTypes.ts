@@ -9,3 +9,8 @@ export interface statistics {
     score: number;
     speed: number;
 }
+
+export interface scoreSign {
+    name: string;
+    score: number;
+}

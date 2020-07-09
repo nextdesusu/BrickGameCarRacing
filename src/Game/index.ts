@@ -15,7 +15,8 @@ export default class Game {
     timeFromPrevScore: any;
     columns: Array<number>;
     stats: any;
-    constructor(ctx: any, width: number, height: number, controls: any, tableWidth: number, stats: any) {
+    finishGame: () => {};
+    constructor(ctx: any, width: number, height: number, controls: any, tableWidth: number, stats: any, finishGame: any) {
         this.ctx = ctx;
         this.width = width;
         this.height = height;
@@ -28,6 +29,7 @@ export default class Game {
         this.timeFromPrevScore = Date.now();
         this.columns = [3, 7, 11, 15, 19];
         this.stats = stats;
+        this.finishGame = finishGame;
 
         this.finished = false;
     }
@@ -127,6 +129,8 @@ export default class Game {
                 this.drawAll();
                 this.timeCheck();
                 window.requestAnimationFrame(loop);
+            } else {
+                this.finishGame();
             }
         }
         window.requestAnimationFrame(loop);

@@ -1,7 +1,14 @@
+@font-face {
+    font-family: pixel;
+    src: url("../../res/SUBWT___.ttf");
+}
+
 :host {
+    font-family: pixel;
     display: flex;
     align-items: center;
-    justify-content: center
+    justify-content: center;
+    user-select: none;
 }
 
 .menu, .main-canvas {
@@ -11,6 +18,14 @@
     display: none;
 }
 
+.error-message {
+    text-transform: none;
+    color: red;
+    opacity: 0;
+    text-align: center;
+    margin-bottom: 0.4em;
+}
+
 .overlap {
     background-color: #A2B6AB;
     width: 500px;
@@ -18,15 +33,52 @@
     text-transform: capitalize;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+}
+
+.overlap > label {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.overlap > label > input, .overlap > button {
+    border-radius: 0.3em;
+    font-family: pixel;
+    color: white;
+    background-color: #030906;
+    padding: 0.3em;
+    border: none;
+    box-shadow: 1px 3px 1px black;
+    font-size: 0.8em;
+}
+
+.overlap > button {
+    color: #030906;
+    background-color: white;
+    font-size: 1.5em;
+    box-shadow: 1px 3px 1px white;
+    text-transform: uppercase;
+    margin: 0 2em 0 2em;
+}
+
+.overlap > button:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .menu {
     background-color: #A2B6AB;
     border-left: none;
     display: grid;
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-rows: 0.5fr 1fr;
     align-items: center;
     justify-content: center;
     text-transform: capitalize;
     display: none;
+}
+.menu-text {
+    border-bottom: 2px solid black;
 }
