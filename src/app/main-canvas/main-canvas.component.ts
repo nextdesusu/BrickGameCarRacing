@@ -1,11 +1,7 @@
 import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular/core';
 import Game from "../../Game";
-const MIN_X = 1, MAX_X = 6;
-
-interface controls {
-  positionX: number;
-  pause: boolean;
-}
+import { controls, statistics } from "../../Game/gameTypes";
+const MIN_X = 1;
 
 @Component({
   selector: 'app-main-canvas',
@@ -15,9 +11,15 @@ interface controls {
 export class MainCanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   canvas: ElementRef<HTMLCanvasElement>; 
+  @ViewChild('overlap', { static: true })
+  overlap: ElementRef<HTMLDivElement>;
+  @ViewChild('menu', { static: true })
+  menu: ElementRef<HTMLDivElement>;
   ctx = null;
   ctrls: controls;
   tableWidth: number;
+  stats: statistics;
+  playerName: string;
   @HostListener('document:keypress', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
     if (event.code === "KeyA") {
@@ -40,15 +42,29 @@ export class MainCanvasComponent implements OnInit {
       positionX: 3,
       pause: false
     };
+    this.stats = {
+      score: 0,
+      speed: 0
+    }
   }
   
   ngOnInit(): void {
-    this.tableWidth = 10;
+  }
+
+  public startGame(): void {
+    const overlap = this.overlap.nativeElement;
     const canvas = this.canvas.nativeElement;
+    const menu = this.menu.nativeElement;
+
+    overlap.style.display = "none";
+    canvas.style.display = "block";
+    menu.style.display = "grid";
+    this.tableWidth = 10;
     const ctx = canvas.getContext('2d');
-    canvas.width = 500;
-    canvas.height = 500;
-    const game = new Game(ctx, canvas.width, canvas.height, this.ctrls, this.tableWidth);
+    const GAME_HEIGHT = 500;
+    canvas.width = GAME_HEIGHT / 2;
+    canvas.height = GAME_HEIGHT;
+    const game = new Game(ctx, canvas.width, canvas.height, this.ctrls, this.tableWidth, this.stats);
     game.startLoop();
   }
 

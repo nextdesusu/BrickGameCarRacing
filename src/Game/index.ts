@@ -8,40 +8,33 @@ export default class Game {
     controls: any;
     tableWidth: number;
     finished: boolean;
-    cellSizeW: number;
-    cellSizeH: number;
+    cellSize: number;
     fabric: Fabric;
     timeFromPrevMove: any;
     timeFromSpeedGrow: any;
     timeFromPrevScore: any;
-    speed: number;
-    score: number;
     columns: Array<number>;
-
-    constructor(ctx: any, width: number, height: number, controls: any, tableWidth) {
+    stats: any;
+    constructor(ctx: any, width: number, height: number, controls: any, tableWidth: number, stats: any) {
         this.ctx = ctx;
         this.width = width;
         this.height = height;
         this.controls = controls;
         this.tableWidth = tableWidth;
-        this.cellSizeW = Math.floor(width / 20);
-        this.cellSizeH = Math.floor(height / 20);
+        this.cellSize = Math.floor(height / 20)
         this.fabric = new Fabric(tableWidth);
         this.timeFromPrevMove = 0;
         this.timeFromSpeedGrow = 0;
         this.timeFromPrevScore = Date.now();
         this.columns = [3, 7, 11, 15, 19];
+        this.stats = stats;
 
         this.finished = false;
-        this.speed = 1;
-        this.score = 0;
-
-        this.ctx.font = "36px serif";
     }
 
     drawSquare(x: number, y: number) {
-        this.ctx.strokeRect(x * this.cellSizeW, y * this.cellSizeH, this.cellSizeW, this.cellSizeH);
-        this.ctx.fillRect(x * this.cellSizeW + 5, y * this.cellSizeH + 5, this.cellSizeW - 10, this.cellSizeH - 10);
+        this.ctx.strokeRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
+        this.ctx.fillRect(x * this.cellSize + 5, y * this.cellSize + 5, this.cellSize - 10, this.cellSize - 10);
     }
 
     drawAll(): void {
@@ -50,7 +43,6 @@ export default class Game {
         this.ctx.fillRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = SM_COLOR;
         this.ctx.fillStyle = SM_COLOR;
-        let cols = [3, 7, 11, 15, 20];
         for (let x = 1; x < this.tableWidth - 1; x += 1) {
             for (let y = 0; y < GAME_TABLE_Y; y += 1) {
                 this.drawSquare(x, y);
@@ -68,7 +60,7 @@ export default class Game {
             this.drawSquare(0, columnI);
             this.drawSquare(this.tableWidth - 1, columnI);
         }
-    
+
         this.ctx.strokeStyle = M_COLOR;
         this.ctx.fillStyle = M_COLOR;
 
@@ -95,22 +87,11 @@ export default class Game {
                 }
             }
         }
-
-        const interfaceStartX = this.tableWidth * this.cellSizeW;
-        const maxTextWidth = 150;
-        const textStartX = interfaceStartX + (this.width - interfaceStartX - maxTextWidth) / 2;
-        const textStartY = Math.floor(this.height / 6);
-        this.ctx.fillRect(interfaceStartX, 0, 5, this.height);
-        this.ctx.fillText(`Score: ${this.score}`, textStartX, textStartY, maxTextWidth);
-        this.ctx.fillText(`Hi-Score: ${33}`, textStartX, textStartY + 36, maxTextWidth);
-        this.ctx.fillRect(interfaceStartX, textStartY + (36 * 2), this.width, 5);
-        this.ctx.lineWidth = 10;
-        this.ctx.strokeRect(0, 0, this.width, this.height);
     }
 
     timeCheck(): void {
         const now = Date.now();
-        if (now - this.timeFromPrevMove > SECOND / this.speed) {
+        if (now - this.timeFromPrevMove > SECOND / (this.stats.speed)) {
             for (const enemy of this.fabric.enemies) {
                 if (enemy.y > GAME_TABLE_Y) {
                     this.fabric.removeEnemy(enemy);
@@ -122,17 +103,16 @@ export default class Game {
                     this.fabric.spawnEnemyCar();
                 }
                 enemy.move(enemy.x, enemy.y + 1);
-
-                this.columns = this.columns.map((columnI) => columnI > 18 ? 0 : columnI + 1);
             }
+            this.columns = this.columns.map((columnI) => columnI > 18 ? 0 : columnI + 1);
             this.timeFromPrevMove = now;
         }
-        if (now - this.timeFromSpeedGrow > (SECOND * 5)) {
-            this.speed += 1;
+        if (now - this.timeFromSpeedGrow > (SECOND * 6)) {
+            this.stats.speed += 1;
             this.timeFromSpeedGrow = now;
         }
-        if (now - this.timeFromPrevScore > (SECOND * 2)) {
-            this.score += 1;
+        if (now - this.timeFromPrevScore > (SECOND * 3)) {
+            this.stats.score = 1 * this.stats.speed;
             this.timeFromPrevScore = now;
         }
         this.fabric.player.move(this.controls.positionX, this.fabric.player.y);
@@ -145,11 +125,9 @@ export default class Game {
         const loop = () => {
             if (!this.finished) {
                 this.drawAll();
-                this.timeCheck(); 
-            } else {
-                // do something with a score here
+                this.timeCheck();
+                window.requestAnimationFrame(loop);
             }
-            window.requestAnimationFrame(loop);
         }
         window.requestAnimationFrame(loop);
     }

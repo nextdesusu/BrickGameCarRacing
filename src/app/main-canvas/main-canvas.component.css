@@ -4,6 +4,29 @@
     justify-content: center
 }
 
-.main-canvas {
+.menu, .main-canvas {
+    width: 250px;
+    height: 500px;
+    border: 2px solid #030906;
+    display: none;
+}
 
+.overlap {
+    background-color: #A2B6AB;
+    width: 500px;
+    height: 500px;
+    text-transform: capitalize;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu {
+    background-color: #A2B6AB;
+    border-left: none;
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    align-items: center;
+    justify-content: center;
+    text-transform: capitalize;
+    display: none;
 }

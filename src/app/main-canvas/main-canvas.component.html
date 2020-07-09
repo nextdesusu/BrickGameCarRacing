@@ -3,3 +3,19 @@
     class="main-canvas"
 >
 </canvas>
+<div #menu class="menu">
+    <h3>score: {{stats.score}}</h3>
+    <h3>speed: {{stats.speed}}</h3>
+    <div>
+        <h3>top players</h3>
+        <ol>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ol>
+    </div>
+</div>
+<div #overlap class="overlap">
+    <label>enter name <input/></label>
+    <button (click)="startGame()">start game</button>
+</div>
