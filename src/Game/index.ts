@@ -1,4 +1,5 @@
 import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
+import { gameConfig } from "./gameTypes";
 import Fabric from "./Fabric";
 
 export default class Game {
@@ -15,8 +16,9 @@ export default class Game {
     timeFromPrevScore: any;
     columns: Array<number>;
     stats: any;
-    finishGame: () => {};
-    constructor(ctx: any, width: number, height: number, controls: any, tableWidth: number, stats: any, finishGame: any) {
+    finishGame: () => void;
+    lostSound: any;
+    constructor({ ctx, width, height, controls, tableWidth, stats, finish, lostSound }: gameConfig) {
         this.ctx = ctx;
         this.width = width;
         this.height = height;
@@ -29,7 +31,8 @@ export default class Game {
         this.timeFromPrevScore = Date.now();
         this.columns = [3, 7, 11, 15, 19];
         this.stats = stats;
-        this.finishGame = finishGame;
+        this.finishGame = finish;
+        this.lostSound = lostSound;
 
         this.finished = false;
     }
@@ -130,6 +133,7 @@ export default class Game {
                 this.timeCheck();
                 window.requestAnimationFrame(loop);
             } else {
+                this.lostSound.nativeElement.play();
                 this.finishGame();
             }
         }

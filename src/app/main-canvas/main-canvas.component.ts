@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef, OnInit, HostListener } from '@angular/core';
 import Game from "../../Game";
-import { controls, statistics, scoreSign } from "../../Game/gameTypes";
+import { controls, statistics, scoreSign, gameConfig } from "../../Game/gameTypes";
 
 const MIN_X = 1;
 const NAME_VALIDATION_REGEXP = /\w{4,8}/;
@@ -19,6 +19,8 @@ export class MainCanvasComponent implements OnInit {
   menu: ElementRef<HTMLDivElement>;
   @ViewChild('errorMessage', { static: true })
   errorMessage: ElementRef<HTMLSpanElement>;
+  @ViewChild('lostSound', { static: true })
+  lostSound: ElementRef<HTMLAudioElement>
   ctx = null;
   ctrls: controls;
   tableWidth: number;
@@ -130,8 +132,17 @@ export class MainCanvasComponent implements OnInit {
         speed: 0
       };
     }
-
-    const game = new Game(ctx, canvas.width, canvas.height, this.ctrls, this.tableWidth, this.stats, finishGame);
+    const gameConfig: gameConfig = {
+      ctx: ctx,
+      width: canvas.width,
+      height: canvas.height,
+      controls: this.ctrls,
+      tableWidth: this.tableWidth,
+      stats: this.stats,
+      finish: finishGame,
+      lostSound: this.lostSound,
+    };
+    const game = new Game(gameConfig);
     game.startLoop();
   }
 }
