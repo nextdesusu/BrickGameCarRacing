@@ -1,13 +1,13 @@
 import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
-import { gameConfig } from "./gameTypes";
+import { gameConfig, statistics, controls } from "./gameTypes";
 import Fabric from "./Fabric";
 import Car from "./Car";
 
 export default class Game {
-    ctx: any;
+    ctx: CanvasRenderingContext2D;
     width: number;
     height: number;
-    controls: any;
+    controls: controls;
     tableWidth: number;
     finished: boolean;
     cellSize: number;
@@ -16,9 +16,10 @@ export default class Game {
     timeFromSpeedGrow: any;
     timeFromPrevScore: any;
     columns: Array<number>;
-    stats: any;
+    stats: statistics;
     finishGame: () => void;
     lostSound: any;
+
     enemies: Array<Car>;
     player: Car;
     constructor({ ctx, width, height, controls, tableWidth, stats, finish, lostSound }: gameConfig) {

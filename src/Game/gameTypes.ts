@@ -16,10 +16,10 @@ export interface scoreSign {
 }
 
 export interface gameConfig {
-    ctx: any;
+    ctx: CanvasRenderingContext2D;
     width: number;
     height: number;
-    controls: any;
+    controls: controls;
     tableWidth: number;
     stats: statistics;
     finish: () => void;

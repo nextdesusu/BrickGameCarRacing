@@ -14,11 +14,11 @@ export class MainCanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   canvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('lostSound', { static: true })
-  lostSound: ElementRef<HTMLAudioElement>
+  lostSound: ElementRef<HTMLAudioElement>;
 
   errorOpacity: 0 | 1;
   gameStarted: boolean;
-  ctx = null;
+  ctx: CanvasRenderingContext2D;
   ctrls: controls;
   tableWidth: number;
   stats: statistics;
