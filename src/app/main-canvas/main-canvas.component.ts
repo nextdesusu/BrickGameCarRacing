@@ -13,14 +13,11 @@ const NAME_VALIDATION_REGEXP = /\w{4,8}/;
 export class MainCanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   canvas: ElementRef<HTMLCanvasElement>;
-  @ViewChild('overlap', { static: true })
-  overlap: ElementRef<HTMLDivElement>;
-  @ViewChild('menu', { static: true })
-  menu: ElementRef<HTMLDivElement>;
-  @ViewChild('errorMessage', { static: true })
-  errorMessage: ElementRef<HTMLSpanElement>;
   @ViewChild('lostSound', { static: true })
   lostSound: ElementRef<HTMLAudioElement>
+
+  errorOpacity: 0 | 1;
+  gameStarted: boolean;
   ctx = null;
   ctrls: controls;
   tableWidth: number;
@@ -31,12 +28,12 @@ export class MainCanvasComponent implements OnInit {
   handleKeyboardEvent(event: KeyboardEvent) {
     if (event.code === "KeyA") {
       if (this.ctrls.positionX > MIN_X) {
-        this.ctrls.positionX = this.ctrls.positionX - 1;
+        this.ctrls.positionX -= 1;
       }
     }
     if (event.code === "KeyD") {
       if (this.ctrls.positionX < this.tableWidth - 4) {
-        this.ctrls.positionX = this.ctrls.positionX + 1;
+        this.ctrls.positionX += 1;
       }
     }
     if (event.code === "Space") {
@@ -45,6 +42,8 @@ export class MainCanvasComponent implements OnInit {
   }
 
   constructor() {
+    this.gameStarted = false;
+    this.errorOpacity = 0;
     this.ctrls = {
       positionX: 3,
       pause: false
@@ -67,11 +66,10 @@ export class MainCanvasComponent implements OnInit {
   }
 
   validatePlayerName(): void {
-    const errorSpan = this.errorMessage.nativeElement;
     if (!this.playerName.match(NAME_VALIDATION_REGEXP)) {
-      errorSpan.style.opacity = "1";
+      this.errorOpacity = 1;
     } else {
-      errorSpan.style.opacity = "0";
+      this.errorOpacity = 0
     }
   }
 
@@ -81,16 +79,12 @@ export class MainCanvasComponent implements OnInit {
   }
 
   public startGame(): void {
-    const overlap = this.overlap.nativeElement;
+    this.gameStarted = true;
     const canvas = this.canvas.nativeElement;
-    const menu = this.menu.nativeElement;
     this.validatePlayerName();
     if (!this.playerName.match(NAME_VALIDATION_REGEXP)) {
       return;
     }
-    overlap.style.display = "none";
-    canvas.style.display = "block";
-    menu.style.display = "grid";
     this.tableWidth = 10;
     const ctx = canvas.getContext('2d');
     const GAME_HEIGHT = 500;
@@ -120,9 +114,6 @@ export class MainCanvasComponent implements OnInit {
 
     const finishGame = (): void => {
       changeScore();
-      overlap.style.display = "flex";
-      canvas.style.display = "none";
-      menu.style.display = "none";
       this.ctrls = {
         positionX: 3,
         pause: false
@@ -131,6 +122,7 @@ export class MainCanvasComponent implements OnInit {
         score: 0,
         speed: 0
       };
+      this.gameStarted = false;
     }
     const gameConfig: gameConfig = {
       ctx: ctx,

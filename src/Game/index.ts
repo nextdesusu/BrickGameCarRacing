@@ -1,6 +1,7 @@
 import { GAME_TABLE_Y, BG_COLOR, M_COLOR, SM_COLOR, SECOND } from "./consts";
 import { gameConfig } from "./gameTypes";
 import Fabric from "./Fabric";
+import Car from "./Car";
 
 export default class Game {
     ctx: any;
@@ -18,6 +19,8 @@ export default class Game {
     stats: any;
     finishGame: () => void;
     lostSound: any;
+    enemies: Array<Car>;
+    player: Car;
     constructor({ ctx, width, height, controls, tableWidth, stats, finish, lostSound }: gameConfig) {
         this.ctx = ctx;
         this.width = width;
@@ -35,6 +38,10 @@ export default class Game {
         this.lostSound = lostSound;
 
         this.finished = false;
+    }
+
+    removeEnemy(toRemove: Car) {
+        this.enemies = this.enemies.filter((enemy) => enemy !== toRemove);
     }
 
     drawSquare(x: number, y: number) {
@@ -69,7 +76,7 @@ export default class Game {
         this.ctx.strokeStyle = M_COLOR;
         this.ctx.fillStyle = M_COLOR;
 
-        const player = this.fabric.player;
+        const player = this.player;
         const pMask = player.mask;
         for (let x = 0; x < pMask.length; x += 1) {
             for (let y = 0; y < pMask[x].length; y += 1) {
@@ -80,7 +87,7 @@ export default class Game {
                 }
             }
         }
-        for (const enemy of this.fabric.enemies) {
+        for (const enemy of this.enemies) {
             const { mask, x, y } = enemy;
             for (let sx = 0; sx < mask.length; sx++) {
                 for (let sy = 0; sy < mask[sx].length; sy++) {
@@ -97,15 +104,15 @@ export default class Game {
     timeCheck(): void {
         const now = Date.now();
         if (now - this.timeFromPrevMove > SECOND / (this.stats.speed)) {
-            for (const enemy of this.fabric.enemies) {
+            for (const enemy of this.enemies) {
                 if (enemy.y > GAME_TABLE_Y) {
-                    this.fabric.removeEnemy(enemy);
+                    this.removeEnemy(enemy);
                 }
-                if (this.fabric.player.isBeenHit(enemy)) {
+                if (this.player.isBeenHit(enemy)) {
                     this.finished = true;
                 }
                 if (enemy.y === 6) {
-                    this.fabric.spawnEnemyCar();
+                    this.enemies.push(this.fabric.spawnEnemyCar());
                 }
                 enemy.move(enemy.x, enemy.y + 1);
             }
@@ -120,13 +127,14 @@ export default class Game {
             this.stats.score = 1 * this.stats.speed;
             this.timeFromPrevScore = now;
         }
-        this.fabric.player.move(this.controls.positionX, this.fabric.player.y);
+        this.player.move(this.controls.positionX, this.player.y);
 
     }
 
     startLoop(): void {
-        this.fabric.spawnPlayerCar();
-        this.fabric.spawnEnemyCar();
+        this.enemies = [];
+        this.player = this.fabric.spawnPlayerCar();
+        this.enemies.push(this.fabric.spawnEnemyCar());
         const loop = () => {
             if (!this.finished) {
                 this.drawAll();

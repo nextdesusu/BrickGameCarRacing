@@ -1,9 +1,10 @@
 <canvas
     #canvas
+    [ngStyle]="{display: gameStarted?'block':'none'}"
     class="main-canvas"
 >
 </canvas>
-<div #menu class="menu">
+<div *ngIf="gameStarted" class="menu">
     <div class="menu-text">
         <h3>score: {{stats.score}}</h3>
         <h3>speed: {{stats.speed}}</h3>
@@ -17,9 +18,14 @@
         </ol>
     </div>
 </div>
-<div #overlap class="overlap">
+<div *ngIf="!gameStarted" class="overlap">
     <label>enter name <input (keyup)="onKeyUp($event)"/></label>
-    <span #errorMessage class="error-message">Name must contain from 4 to 8 alphabetic or digit characters</span>
+    <span
+        [ngStyle]="{opacity: errorOpacity}"
+        class="error-message"
+    >
+        Name must contain from 4 to 8 alphabetic or digit characters
+    </span>
     <button (click)="startGame()">start game</button>
 </div>
 <audio #lostSound src="../../assets/lost.mp3"></audio>

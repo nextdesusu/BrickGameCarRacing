@@ -20,28 +20,19 @@ const randomInteger = (min: number, max: number): number => {
 
 export default class Fabric {
     tableWidth: number;
-    player: Car;
-    enemies: Array<Car>;
     constructor(tableWidth) {
         this.tableWidth = tableWidth;
-        this.enemies = []
     }
 
-    spawnEnemyCar(): void {
+    spawnEnemyCar(): Car {
         const x: number = randomInteger(1, this.tableWidth - 4);
         const y: number = -4;
-        const enemy = new Car(ENEMY_CAR, x, y);
-        this.enemies.push(enemy);
+        return new Car(ENEMY_CAR, x, y);
     }
 
-    removeEnemy(toRemove: Car) {
-        this.enemies = this.enemies.filter((enemy) => enemy !== toRemove);
-    }
-
-    spawnPlayerCar(): void {
+    spawnPlayerCar(): Car {
         const x = Math.floor((this.tableWidth + 3) / 2);
         const y = 15;
-        const player = new Car(PLAYER_CAR, x, y);
-        this.player = player;
+        return new Car(PLAYER_CAR, x, y);
     }
 }
